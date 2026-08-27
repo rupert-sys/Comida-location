@@ -221,6 +221,81 @@
   .refresh-btn:active{ transform:scale(0.96); }
   .refresh-btn:disabled{ opacity:0.4; cursor:not-allowed; }
 
+  /* ---------- Panel de Google Places ---------- */
+  .google-panel{
+    max-width:760px;
+    margin:0 auto 18px;
+  }
+  .google-toggle{
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    background:rgba(241,233,214,0.06);
+    border:1px solid rgba(241,233,214,0.16);
+    color:var(--text-on-ink);
+    padding:12px 16px;
+    min-height:44px;
+    border-radius:10px;
+    font-size:13px;
+    font-weight:500;
+    cursor:pointer;
+    text-align:left;
+  }
+  .google-toggle .dot{
+    width:8px;height:8px;border-radius:50%;
+    background:rgba(241,233,214,0.3);
+    flex-shrink:0;
+  }
+  .google-toggle .dot.connected{ background:var(--tomatillo); }
+  .google-form{
+    margin-top:10px;
+    padding:16px;
+    background:rgba(241,233,214,0.05);
+    border:1px solid rgba(241,233,214,0.12);
+    border-radius:10px;
+  }
+  .google-form p{
+    font-size:12.5px;
+    line-height:1.5;
+    color:var(--text-on-ink-dim);
+    margin:0 0 12px;
+  }
+  .google-form input{
+    width:100%;
+    background:var(--ink);
+    border:1px solid rgba(241,233,214,0.25);
+    color:var(--text-on-ink);
+    padding:12px 14px;
+    min-height:44px;
+    border-radius:8px;
+    font-size:14px;
+    font-family:'Space Mono', monospace;
+    margin-bottom:12px;
+  }
+  .google-form-actions{
+    display:flex;
+    gap:10px;
+    margin-bottom:12px;
+  }
+  .google-form-actions button{
+    min-height:40px;
+    padding:8px 16px;
+    border-radius:7px;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    border:none;
+  }
+  #googleSaveBtn{ background:var(--marigold); color:#241905; }
+  #googleClearBtn{ background:transparent; border:1px solid rgba(241,233,214,0.25); color:var(--text-on-ink-dim); }
+  .google-form a{
+    font-size:12px;
+    color:var(--marigold);
+    text-decoration:underline;
+  }
+
   .chips{
     display:flex;
     flex-wrap:wrap;
@@ -311,6 +386,66 @@
   }
 
   .ticket-top{ padding:18px 20px 16px; }
+
+  /* ---------- Foto del lugar ---------- */
+  .ticket-photo{
+    position:relative;
+    width:100%;
+    height:150px;
+    background:var(--ink-3);
+    overflow:hidden;
+  }
+  .ticket-photo img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .ticket-photo.placeholder{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(242,169,59,0.16), transparent 55%),
+      var(--ink-3);
+  }
+  .ticket-photo.placeholder svg{ color:rgba(241,233,214,0.35); }
+  .ticket-photo .open-badge{
+    position:absolute;
+    top:10px; left:10px;
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+    padding:4px 10px;
+    border-radius:999px;
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+  }
+  .open-badge.open{ background:rgba(144,184,79,0.9); color:#132308; }
+  .open-badge.closed{ background:rgba(225,75,61,0.9); color:#FFF6EA; }
+
+  /* ---------- Estrellas ---------- */
+  .rating-row{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    margin-bottom:12px;
+  }
+  .stars{ display:inline-flex; gap:2px; }
+  .star{ position:relative; width:15px; height:15px; }
+  .star svg{ position:absolute; top:0; left:0; width:15px; height:15px; }
+  .star .bg{ color:rgba(43,33,24,0.18); }
+  .star .fill-wrap{ position:absolute; top:0; left:0; height:15px; overflow:hidden; }
+  .star .fill-wrap svg{ color:var(--marigold); }
+  .rating-number{ font-family:'Space Mono', monospace; font-weight:700; font-size:13px; color:var(--text-on-paper); }
+  .rating-count{ font-size:12px; color:var(--text-on-paper-dim); }
+  .no-rating{
+    display:flex; align-items:center; gap:6px;
+    font-size:12px; color:var(--text-on-paper-dim);
+    margin-bottom:12px;
+  }
+  .no-rating svg{ opacity:0.5; }
   .ticket-head{
     display:flex;
     justify-content:space-between;
@@ -518,6 +653,24 @@
 </div>
 
 <section class="controls" id="controls" style="display:none;">
+  <div class="google-panel">
+    <button class="google-toggle" id="googleToggle" type="button">
+      <span style="display:flex;align-items:center;gap:10px;">
+        <span class="dot" id="googleDot"></span>
+        <span id="googleToggleLabel">Activar fotos y calificaciones reales (Google)</span>
+      </span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+    </button>
+    <div class="google-form" id="googleForm" style="display:none;">
+      <p>Sin esto, los puestos vienen de OpenStreetMap y no traen fotos ni estrellas (ese mapa no las tiene). Si pegas aquí tu propia clave de la API de Places de Google, cada tarjeta mostrará foto real y calificación con estrellas. Tu clave se guarda solo en este navegador, nunca se envía a nadie más que a Google.</p>
+      <input type="password" id="googleKeyInput" placeholder="Pega aquí tu Google Places API key" autocomplete="off" spellcheck="false">
+      <div class="google-form-actions">
+        <button id="googleSaveBtn" type="button">Guardar y usar</button>
+        <button id="googleClearBtn" type="button">Quitar clave</button>
+      </div>
+      <a href="https://developers.google.com/maps/documentation/places/web-service/get-api-key" target="_blank" rel="noopener">Cómo obtener una clave gratuita de Google →</a>
+    </div>
+  </div>
   <div class="controls-row">
     <div class="radius-control">
       <label for="radiusSlider">Radio de búsqueda</label>
@@ -531,7 +684,7 @@
     <button class="chip" data-filter="restaurant">Restaurantes</button>
     <button class="chip" data-filter="fast_food">Comida rápida / puestos</button>
     <button class="chip" data-filter="cafe">Cafés</button>
-    <button class="chip" data-filter="bar,pub">Bares</button>
+    <button class="chip" data-filter="bar">Bares</button>
   </div>
 </section>
 
@@ -550,7 +703,7 @@
 </button>
 
 <footer>
-  Datos de ubicación de puestos vía OpenStreetMap · Rutas y reseñas abren en Google Maps
+  Ubicación de puestos vía OpenStreetMap · Fotos y estrellas vía Google Places (si conectas tu clave) · Rutas y reseñas abren en Google Maps
 </footer>
 
 <script>
@@ -604,14 +757,99 @@
     }
   });
 
-  const TYPE_LABELS = {
+  const CATEGORY_LABELS = {
     restaurant: 'Restaurante',
     fast_food: 'Comida rápida',
     cafe: 'Café',
-    bar: 'Bar',
-    pub: 'Bar',
-    food_court: 'Plaza de comida'
+    bar: 'Bar'
   };
+
+  // Tipos de "Table A" de Google Places (New) usados para acotar la búsqueda a comida/bebida
+  const GOOGLE_FOOD_TYPES = [
+    'restaurant','fast_food_restaurant','meal_takeaway','meal_delivery','cafe','coffee_shop',
+    'bakery','bar','pub','wine_bar','night_club','food_court','dessert_shop','ice_cream_shop',
+    'sandwich_shop','pizza_restaurant','mexican_restaurant','seafood_restaurant','steak_house',
+    'breakfast_restaurant','brunch_restaurant','diner','buffet_restaurant','fine_dining_restaurant'
+  ];
+  const GOOGLE_FIELD_MASK = [
+    'places.id','places.displayName','places.types','places.primaryType','places.formattedAddress',
+    'places.internationalPhoneNumber','places.nationalPhoneNumber','places.rating','places.userRatingCount',
+    'places.location','places.photos','places.googleMapsUri','places.currentOpeningHours.openNow'
+  ].join(',');
+
+  const CUISINE_LABELS = {
+    mexican_restaurant:'Mexicana', italian_restaurant:'Italiana', japanese_restaurant:'Japonesa',
+    sushi_restaurant:'Sushi', seafood_restaurant:'Mariscos', pizza_restaurant:'Pizza',
+    steak_house:'Asados', vegan_restaurant:'Vegana', vegetarian_restaurant:'Vegetariana',
+    thai_restaurant:'Tailandesa', chinese_restaurant:'China', korean_restaurant:'Coreana',
+    indian_restaurant:'India', french_restaurant:'Francesa', mediterranean_restaurant:'Mediterránea',
+    american_restaurant:'Americana', barbecue_restaurant:'Barbacoa / BBQ', breakfast_restaurant:'Desayunos',
+    brunch_restaurant:'Brunch', hamburger_restaurant:'Hamburguesas', sandwich_shop:'Sándwiches',
+    ramen_restaurant:'Ramen', bagel_shop:'Bagels', donut_shop:'Donas', ice_cream_shop:'Nieves / helados',
+    juice_shop:'Jugos', tea_house:'Té', wine_bar:'Vinos', spanish_restaurant:'Española',
+    turkish_restaurant:'Turca', lebanese_restaurant:'Libanesa', greek_restaurant:'Griega',
+    vietnamese_restaurant:'Vietnamita', indonesian_restaurant:'Indonesia', buffet_restaurant:'Buffet',
+    fine_dining_restaurant:'Alta cocina', bar_and_grill:'Bar y parrilla'
+  };
+  function cuisineLabel(types){
+    const t = (types || []).find(x => CUISINE_LABELS[x]);
+    return t ? CUISINE_LABELS[t] : null;
+  }
+  function categoryOfGoogleTypes(types){
+    const t = types || [];
+    if (t.some(x => ['cafe','coffee_shop','bakery','tea_house'].includes(x))) return 'cafe';
+    if (t.some(x => ['bar','pub','wine_bar','night_club','bar_and_grill'].includes(x))) return 'bar';
+    if (t.some(x => ['fast_food_restaurant','meal_takeaway','meal_delivery'].includes(x))) return 'fast_food';
+    return 'restaurant';
+  }
+  function categoryOfOsmAmenity(amenity){
+    if (amenity === 'cafe') return 'cafe';
+    if (amenity === 'bar' || amenity === 'pub') return 'bar';
+    if (amenity === 'fast_food' || amenity === 'food_court') return 'fast_food';
+    return 'restaurant';
+  }
+
+  // ---------- Manejo de la clave de Google Places (guardada solo en este navegador) ----------
+  const googleToggle = document.getElementById('googleToggle');
+  const googleForm = document.getElementById('googleForm');
+  const googleKeyInput = document.getElementById('googleKeyInput');
+  const googleSaveBtn = document.getElementById('googleSaveBtn');
+  const googleClearBtn = document.getElementById('googleClearBtn');
+  const googleDot = document.getElementById('googleDot');
+  const googleToggleLabel = document.getElementById('googleToggleLabel');
+
+  function getApiKey(){
+    try { return localStorage.getItem('antojosGooglePlacesKey') || ''; } catch(e){ return ''; }
+  }
+  function refreshGoogleUI(){
+    const key = getApiKey();
+    if (key){
+      googleDot.classList.add('connected');
+      googleToggleLabel.textContent = 'Fotos y calificaciones de Google: activadas';
+      googleKeyInput.value = key;
+    } else {
+      googleDot.classList.remove('connected');
+      googleToggleLabel.textContent = 'Activar fotos y calificaciones reales (Google)';
+    }
+  }
+  refreshGoogleUI();
+
+  googleToggle.addEventListener('click', () => {
+    googleForm.style.display = googleForm.style.display === 'none' ? 'block' : 'none';
+  });
+  googleSaveBtn.addEventListener('click', () => {
+    const key = googleKeyInput.value.trim();
+    if (!key) return;
+    try { localStorage.setItem('antojosGooglePlacesKey', key); } catch(e){}
+    refreshGoogleUI();
+    if (userCoords) fetchPlaces();
+  });
+  googleClearBtn.addEventListener('click', () => {
+    try { localStorage.removeItem('antojosGooglePlacesKey'); } catch(e){}
+    googleKeyInput.value = '';
+    refreshGoogleUI();
+    if (userCoords) fetchPlaces();
+  });
 
   function formatRadius(m){
     return m >= 1000 ? (m/1000).toFixed(1) + ' km' : m + ' m';
@@ -701,6 +939,87 @@
     showLoading();
     refreshBtn.disabled = true;
     const radius = parseInt(radiusSlider.value, 10);
+    const apiKey = getApiKey();
+
+    let places = null;
+    let usedSource = null;
+
+    if (apiKey){
+      try{
+        places = await fetchPlacesGoogle(radius, apiKey);
+        usedSource = 'google';
+      } catch(err){
+        setStatus('Tu clave de Google no funcionó (' + err.message + '). Usando OpenStreetMap sin fotos ni estrellas.', 'error');
+      }
+    }
+
+    if (!places){
+      try{
+        places = await fetchPlacesOsm(radius);
+        usedSource = 'osm';
+      } catch(err){
+        refreshBtn.disabled = false;
+        setStatus('No se pudo conectar con el mapa. Revisa tu conexión e intenta de nuevo.', 'error');
+        showEmpty('No pudimos cargar el mapa', 'El servicio de mapas no respondió. Toca "Actualizar búsqueda" para intentarlo otra vez.');
+        return;
+      }
+    }
+
+    refreshBtn.disabled = false;
+    allPlaces = places.sort((a,b) => a.distance - b.distance);
+
+    const fuente = usedSource === 'google' ? 'con fotos y calificaciones de Google' : 'vía OpenStreetMap, sin fotos ni calificaciones';
+    setStatus('Listo. Encontramos ' + allPlaces.length + ' lugar' + (allPlaces.length === 1 ? '' : 'es') + ' en un radio de ' + formatRadius(radius) + ' (' + fuente + ').', 'ok');
+    renderResults();
+  }
+
+  async function fetchPlacesGoogle(radius, apiKey){
+    const res = await fetch('https://places.googleapis.com/v1/places:searchNearby', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'X-Goog-Api-Key': apiKey,
+        'X-Goog-FieldMask': GOOGLE_FIELD_MASK
+      },
+      body: JSON.stringify({
+        includedTypes: GOOGLE_FOOD_TYPES,
+        maxResultCount: 20,
+        locationRestriction:{
+          circle:{ center:{ latitude:userCoords.lat, longitude:userCoords.lon }, radius: radius }
+        }
+      })
+    });
+    if (!res.ok){
+      let msg = 'HTTP ' + res.status;
+      try{ const j = await res.json(); if (j.error && j.error.message) msg = j.error.message; } catch(e){}
+      throw new Error(msg);
+    }
+    const data = await res.json();
+    return (data.places || []).map(pl => {
+      const lat = pl.location && pl.location.latitude;
+      const lon = pl.location && pl.location.longitude;
+      const distance = haversine(userCoords.lat, userCoords.lon, lat, lon);
+      const photoName = pl.photos && pl.photos[0] ? pl.photos[0].name : null;
+      return {
+        id: pl.id,
+        name: (pl.displayName && pl.displayName.text) || 'Lugar sin nombre',
+        category: categoryOfGoogleTypes(pl.types),
+        cuisine: cuisineLabel(pl.types),
+        phone: pl.internationalPhoneNumber || pl.nationalPhoneNumber || null,
+        openingHours: null,
+        openNow: pl.currentOpeningHours ? pl.currentOpeningHours.openNow : null,
+        address: pl.formattedAddress || null,
+        rating: typeof pl.rating === 'number' ? pl.rating : null,
+        ratingCount: pl.userRatingCount || 0,
+        photoUrl: photoName ? ('https://places.googleapis.com/v1/' + photoName + '/media?maxWidthPx=480&maxHeightPx=360&key=' + apiKey) : null,
+        reviewsUrl: pl.googleMapsUri || null,
+        lat, lon, distance,
+        source:'google'
+      };
+    });
+  }
+
+  async function fetchPlacesOsm(radius){
     const query = '[out:json][timeout:25];(' +
       'node["amenity"~"^(restaurant|fast_food|cafe|food_court|bar|pub)$"](around:' + radius + ',' + userCoords.lat + ',' + userCoords.lon + ');' +
       'way["amenity"~"^(restaurant|fast_food|cafe|food_court|bar|pub)$"](around:' + radius + ',' + userCoords.lat + ',' + userCoords.lon + ');' +
@@ -712,7 +1031,6 @@
     ];
 
     let data = null;
-    let lastError = null;
     for (const url of endpoints){
       try{
         const res = await fetch(url, {
@@ -723,43 +1041,35 @@
         if (!res.ok) throw new Error('HTTP ' + res.status);
         data = await res.json();
         break;
-      } catch(err){
-        lastError = err;
-      }
+      } catch(err){ /* intenta el siguiente endpoint */ }
     }
-
-    refreshBtn.disabled = false;
-
-    if (!data){
-      setStatus('No se pudo conectar con el mapa. Revisa tu conexión e intenta de nuevo.', 'error');
-      showEmpty('No pudimos cargar el mapa', 'El servicio de mapas no respondió. Toca "Actualizar búsqueda" para intentarlo otra vez.');
-      return;
-    }
+    if (!data) throw new Error('sin respuesta de OpenStreetMap');
 
     const elements = data.elements || [];
-    allPlaces = elements
-      .map(el => {
-        const lat = el.lat ?? (el.center && el.center.lat);
-        const lon = el.lon ?? (el.center && el.center.lon);
-        if (lat == null || lon == null) return null;
-        const tags = el.tags || {};
-        const distance = haversine(userCoords.lat, userCoords.lon, lat, lon);
-        return {
-          id: el.type + '/' + el.id,
-          name: tags.name || 'Puesto sin nombre registrado',
-          amenity: tags.amenity || 'restaurant',
-          cuisine: tags.cuisine ? tags.cuisine.replace(/_/g, ' ').replace(/;/g, ', ') : null,
-          phone: tags.phone || tags['contact:phone'] || null,
-          openingHours: tags.opening_hours || null,
-          address: buildAddress(tags),
-          lat, lon, distance
-        };
-      })
-      .filter(Boolean)
-      .sort((a,b) => a.distance - b.distance);
-
-    setStatus('Listo. Encontramos ' + allPlaces.length + ' lugar' + (allPlaces.length === 1 ? '' : 'es') + ' en un radio de ' + formatRadius(radius) + '.', 'ok');
-    renderResults();
+    return elements.map(el => {
+      const lat = el.lat ?? (el.center && el.center.lat);
+      const lon = el.lon ?? (el.center && el.center.lon);
+      if (lat == null || lon == null) return null;
+      const tags = el.tags || {};
+      const distance = haversine(userCoords.lat, userCoords.lon, lat, lon);
+      const name = tags.name || 'Puesto sin nombre registrado';
+      return {
+        id: el.type + '/' + el.id,
+        name,
+        category: categoryOfOsmAmenity(tags.amenity || 'restaurant'),
+        cuisine: tags.cuisine ? tags.cuisine.replace(/_/g, ' ').replace(/;/g, ', ') : null,
+        phone: tags.phone || tags['contact:phone'] || null,
+        openingHours: tags.opening_hours || null,
+        openNow: null,
+        address: buildAddress(tags),
+        rating: null,
+        ratingCount: 0,
+        photoUrl: tags.image || null,
+        reviewsUrl: 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(name + ' ' + lat + ',' + lon),
+        lat, lon, distance,
+        source:'osm'
+      };
+    }).filter(Boolean);
   }
 
   function buildAddress(tags){
@@ -774,7 +1084,7 @@
 
   function matchesFilter(place){
     if (activeFilter === 'all') return true;
-    return activeFilter.split(',').includes(place.amenity);
+    return place.category === activeFilter;
   }
 
   function renderResults(){
@@ -797,11 +1107,36 @@
       '</div>';
   }
 
+  function starsHtml(rating, count){
+    if (rating == null){
+      return '<div class="no-rating"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg><span>Sin calificación de Google disponible</span></div>';
+    }
+    const starSvg = '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>';
+    let stars = '';
+    for (let i = 0; i < 5; i++){
+      const fill = Math.max(0, Math.min(1, rating - i)) * 100;
+      stars += '<span class="star"><span class="bg">' + starSvg + '</span><span class="fill-wrap" style="width:' + fill + '%">' + starSvg + '</span></span>';
+    }
+    return '<div class="rating-row">' +
+      '<span class="stars">' + stars + '</span>' +
+      '<span class="rating-number">' + rating.toFixed(1) + '</span>' +
+      (count ? '<span class="rating-count">(' + count + ')</span>' : '') +
+    '</div>';
+  }
+
   function renderCard(p, rank){
-    const typeLabel = TYPE_LABELS[p.amenity] || 'Cocina';
+    const typeLabel = CATEGORY_LABELS[p.category] || 'Cocina';
     const dirUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + p.lat + ',' + p.lon;
-    const reviewQuery = encodeURIComponent(p.name + ' ' + p.lat + ',' + p.lon);
-    const reviewUrl = 'https://www.google.com/maps/search/?api=1&query=' + reviewQuery;
+
+    const photoBlock = p.photoUrl
+      ? '<div class="ticket-photo">' +
+          '<img src="' + p.photoUrl + '" alt="Foto de ' + escapeHtml(p.name) + '" loading="lazy">' +
+          (p.openNow === true ? '<span class="open-badge open">Abierto ahora</span>' : (p.openNow === false ? '<span class="open-badge closed">Cerrado ahora</span>' : '')) +
+        '</div>'
+      : '<div class="ticket-photo placeholder">' +
+          '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2v7c0 1.1.9 2 2 2h1a2 2 0 0 0 2-2V2M6 2v20M15 2c-1.66 0-3 2.24-3 5s1.34 5 3 5 3-2.24 3-5-1.34-5-3-5zm0 10v10"></path></svg>' +
+          (p.openNow === true ? '<span class="open-badge open">Abierto ahora</span>' : (p.openNow === false ? '<span class="open-badge closed">Cerrado ahora</span>' : '')) +
+        '</div>';
 
     const phoneRow = p.phone
       ? '<div class="row"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg><a href="tel:' + p.phone.replace(/\s+/g,'') + '">' + p.phone + '</a></div>'
@@ -809,10 +1144,13 @@
 
     const addressRow = '<div class="row"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg><span>' + (p.address || 'Sin dirección exacta registrada') + '</span></div>';
 
-    const hoursRow = '<div class="row"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg><span>' + (p.openingHours || 'Horario no disponible') + '</span></div>';
+    const hoursRow = p.source === 'google'
+      ? ''
+      : '<div class="row"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg><span>' + (p.openingHours || 'Horario no disponible') + '</span></div>';
 
     return (
       '<article class="ticket">' +
+        photoBlock +
         '<div class="ticket-top">' +
           '<div class="ticket-head">' +
             '<span class="ticket-rank mono">#' + String(rank).padStart(2,'0') + '</span>' +
@@ -823,12 +1161,13 @@
             '<span class="badge type">' + typeLabel + '</span>' +
             (p.cuisine ? '<span class="badge cuisine">' + escapeHtml(p.cuisine) + '</span>' : '') +
           '</div>' +
+          starsHtml(p.rating, p.ratingCount) +
           '<div class="ticket-meta">' + addressRow + phoneRow + hoursRow + '</div>' +
         '</div>' +
         '<div class="tear-line"></div>' +
         '<div class="ticket-actions">' +
           '<a class="action-directions" href="' + dirUrl + '" target="_blank" rel="noopener">Cómo llegar</a>' +
-          '<a class="action-reviews" href="' + reviewUrl + '" target="_blank" rel="noopener">Ver reseñas</a>' +
+          '<a class="action-reviews" href="' + p.reviewsUrl + '" target="_blank" rel="noopener">Ver reseñas</a>' +
         '</div>' +
       '</article>'
     );
