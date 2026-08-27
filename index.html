@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>¿Qué se te antoja? — Puestos y restaurantes cerca de ti</title>
+
+<!-- iPhone / Safari: permite abrirla como app de pantalla completa -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Antojos">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1B2420">
+<meta name="format-detection" content="telephone=no">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='26' fill='%231B2420'/%3E%3Cpath d='M60 22c22 0 38 13 38 30 0 4-3 7-7 7H29c-4 0-7-3-7-7 0-17 16-30 38-30z' fill='%23F2A93B'/%3E%3Cpath d='M26 62h68c3 0 5 3 4 6-4 14-17 26-34 26S34 82 30 68c-1-3 1-6 4-6z' fill='%23E14B3D'/%3E%3Ccircle cx='45' cy='40' r='4' fill='%231B2420'/%3E%3Ccircle cx='60' cy='34' r='4' fill='%231B2420'/%3E%3Ccircle cx='75' cy='40' r='4' fill='%231B2420'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B2420;
+    --ink-2:#233029;
+    --ink-3:#2E3C33;
+    --paper:#F1E3C6;
+    --paper-dim:#E4D3A9;
+    --paper-line:#C9B487;
+    --chili:#E14B3D;
+    --chili-dark:#B93A2F;
+    --marigold:#F2A93B;
+    --tomatillo:#90B84F;
+    --text-on-ink:#F1E9D6;
+    --text-on-ink-dim:#B9C4B9;
+    --text-on-paper:#2B2118;
+    --text-on-paper-dim:#6B5D45;
+  }
+
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html{
+    scroll-behavior:smooth;
+    -webkit-text-size-adjust:100%;
+  }
+  body{
+    margin:0;
+    background:var(--ink);
+    color:var(--text-on-ink);
+    font-family:'DM Sans', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior-y:contain;
+    overflow-x:hidden;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  button, a{
+    touch-action:manipulation;
+    -webkit-user-select:none;
+    user-select:none;
+  }
+  input[type="range"]{ touch-action:pan-x; }
+  h1,h2,h3, .display{
+    font-family:'Bebas Neue', sans-serif;
+    letter-spacing:0.02em;
+    font-weight:400;
+  }
+  .mono{ font-family:'Space Mono', monospace; }
+
+  a{ color:inherit; }
+  button{ font-family:inherit; }
+
+  :focus-visible{
+    outline:3px solid var(--marigold);
+    outline-offset:2px;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    padding:calc(24px + env(safe-area-inset-top)) 24px 40px;
+    background:
+      radial-gradient(circle at 85% -10%, rgba(242,169,59,0.18), transparent 45%),
+      radial-gradient(circle at 5% 110%, rgba(225,75,61,0.16), transparent 45%),
+      var(--ink);
+    border-bottom:6px solid var(--marigold);
+    overflow:hidden;
+  }
+  .hero::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background-image:
+      linear-gradient(rgba(241,233,214,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(241,233,214,0.035) 1px, transparent 1px);
+    background-size:28px 28px;
+    pointer-events:none;
+  }
+  .hero-inner{
+    position:relative;
+    max-width:760px;
+    margin:0 auto;
+    text-align:center;
+  }
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--marigold);
+    padding:6px 14px;
+    border:1px solid rgba(242,169,59,0.4);
+    border-radius:999px;
+    margin-bottom:20px;
+  }
+  .eyebrow .dot{
+    width:6px;height:6px;border-radius:50%;background:var(--chili);
+    box-shadow:0 0 0 3px rgba(225,75,61,0.25);
+  }
+  .hero h1{
+    font-size:clamp(42px, 9vw, 76px);
+    line-height:0.95;
+    margin:0 0 14px;
+    color:var(--text-on-ink);
+  }
+  .hero h1 span{ color:var(--chili); }
+  .hero p.sub{
+    font-size:16px;
+    color:var(--text-on-ink-dim);
+    max-width:520px;
+    margin:0 auto 32px;
+    line-height:1.55;
+  }
+
+  .locate-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    background:var(--chili);
+    color:#FFF6EA;
+    border:none;
+    padding:16px 28px;
+    min-height:52px;
+    font-size:17px;
+    font-weight:700;
+    border-radius:10px;
+    cursor:pointer;
+    box-shadow:0 6px 0 var(--chili-dark), 0 10px 20px rgba(0,0,0,0.35);
+    transition:transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .locate-btn:hover{ transform:translateY(-2px); }
+  .locate-btn:active{
+    transform:translateY(3px) scale(0.98);
+    box-shadow:0 2px 0 var(--chili-dark), 0 4px 10px rgba(0,0,0,0.3);
+  }
+  .locate-btn:disabled{
+    opacity:0.65;
+    cursor:progress;
+    transform:none;
+  }
+  .locate-btn svg{ flex-shrink:0; }
+
+  .status-line{
+    margin-top:16px;
+    font-family:'Space Mono', monospace;
+    font-size:13px;
+    color:var(--text-on-ink-dim);
+    min-height:18px;
+  }
+  .status-line.error{ color:#F0958C; }
+  .status-line.ok{ color:var(--tomatillo); }
+
+  /* ---------- CONTROLS ---------- */
+  .controls{
+    max-width:920px;
+    margin:0 auto;
+    padding:28px 24px 8px;
+  }
+  .controls-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:18px;
+  }
+  .radius-control{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-size:13px;
+    color:var(--text-on-ink-dim);
+    flex:1 1 260px;
+  }
+  .radius-control input[type="range"]{
+    flex:1;
+    accent-color:var(--marigold);
+  }
+  .radius-value{
+    font-family:'Space Mono', monospace;
+    color:var(--marigold);
+    min-width:52px;
+    text-align:right;
+  }
+  .refresh-btn{
+    background:transparent;
+    border:1px solid rgba(241,233,214,0.3);
+    color:var(--text-on-ink);
+    padding:10px 18px;
+    min-height:44px;
+    border-radius:8px;
+    font-size:13px;
+    font-weight:500;
+    cursor:pointer;
+    white-space:nowrap;
+    transition:border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+  }
+  .refresh-btn:hover{
+    border-color:var(--marigold);
+    background:rgba(242,169,59,0.08);
+  }
+  .refresh-btn:active{ transform:scale(0.96); }
+  .refresh-btn:disabled{ opacity:0.4; cursor:not-allowed; }
+
+  .chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .chip{
+    background:transparent;
+    border:1px solid rgba(241,233,214,0.28);
+    color:var(--text-on-ink-dim);
+    padding:10px 16px;
+    min-height:40px;
+    border-radius:999px;
+    font-size:13px;
+    cursor:pointer;
+    transition:all 0.15s ease;
+  }
+  .chip:hover{ border-color:var(--marigold); color:var(--text-on-ink); }
+  .chip:active{ transform:scale(0.95); }
+  .chip.active{
+    background:var(--marigold);
+    border-color:var(--marigold);
+    color:#241905;
+    font-weight:700;
+  }
+
+  /* ---------- RESULTS ---------- */
+  .results-wrap{
+    max-width:920px;
+    margin:0 auto;
+    padding:24px 24px 80px;
+  }
+  .results-count{
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--text-on-ink-dim);
+    margin:0 0 16px;
+    padding-bottom:10px;
+    border-bottom:1px dashed rgba(241,233,214,0.2);
+  }
+
+  .empty-state, .loading-state{
+    text-align:center;
+    padding:60px 20px;
+    color:var(--text-on-ink-dim);
+  }
+  .empty-state h3, .loading-state h3{
+    color:var(--text-on-ink);
+    font-size:28px;
+    margin:0 0 8px;
+  }
+  .empty-state p, .loading-state p{
+    max-width:400px;
+    margin:0 auto;
+    line-height:1.5;
+    font-size:14px;
+  }
+  .loading-state .spinner{
+    width:34px;height:34px;
+    margin:0 auto 20px;
+    border:3px solid rgba(241,233,214,0.15);
+    border-top-color:var(--marigold);
+    border-radius:50%;
+    animation:spin 0.8s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));
+    gap:22px;
+  }
+
+  /* ---------- TICKET CARD ---------- */
+  .ticket{
+    position:relative;
+    background:var(--paper);
+    color:var(--text-on-paper);
+    border-radius:4px;
+    box-shadow:0 10px 24px rgba(0,0,0,0.28);
+    overflow:hidden;
+    animation:rise 0.35s ease both;
+  }
+  @keyframes rise{
+    from{ opacity:0; transform:translateY(10px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  .ticket-top{ padding:18px 20px 16px; }
+  .ticket-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .ticket-rank{
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    color:var(--text-on-paper-dim);
+  }
+  .ticket-dist{
+    font-family:'Space Mono', monospace;
+    font-size:13px;
+    font-weight:700;
+    color:var(--chili-dark);
+    white-space:nowrap;
+  }
+  .ticket-name{
+    font-family:'Bebas Neue', sans-serif;
+    font-size:26px;
+    line-height:1.05;
+    margin:0 0 6px;
+  }
+  .ticket-badges{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-bottom:12px;
+  }
+  .badge{
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    padding:3px 9px;
+    border-radius:999px;
+  }
+  .badge.type{ background:var(--ink); color:var(--marigold); }
+  .badge.cuisine{ background:rgba(43,33,24,0.08); color:var(--text-on-paper-dim); }
+
+  .ticket-meta{
+    font-size:13px;
+    line-height:1.6;
+    color:var(--text-on-paper-dim);
+  }
+  .ticket-meta .row{
+    display:flex;
+    gap:8px;
+    align-items:flex-start;
+  }
+  .ticket-meta .row + .row{ margin-top:2px; }
+  .ticket-meta svg{ flex-shrink:0; margin-top:2px; opacity:0.7; }
+  .ticket-meta a{ color:var(--text-on-paper); text-decoration:underline; text-decoration-color:rgba(43,33,24,0.3); }
+  .ticket-meta a:hover{ text-decoration-color:var(--chili); }
+
+  .tear{
+    height:14px;
+    background:
+      radial-gradient(circle at 8px 0, transparent 7px, var(--paper) 7.5px) 0 -7px / 16px 14px repeat-x,
+      var(--ink);
+    background-color:transparent;
+  }
+  .tear-line{
+    position:relative;
+    height:0;
+    border-top:2px dashed var(--paper-line);
+    margin:0 20px;
+  }
+
+  .ticket-actions{
+    display:flex;
+    gap:10px;
+    padding:14px 20px 18px;
+  }
+  .ticket-actions a{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    min-height:44px;
+    text-decoration:none;
+    font-size:13px;
+    font-weight:700;
+    padding:10px 10px;
+    border-radius:7px;
+    text-align:center;
+    transition:transform 0.12s ease, opacity 0.12s ease;
+  }
+  .ticket-actions a:hover{ transform:translateY(-1px); }
+  .ticket-actions a:active{ transform:scale(0.96); }
+  .action-directions{
+    background:var(--chili);
+    color:#FFF6EA;
+  }
+  .action-reviews{
+    background:transparent;
+    border:1.5px solid rgba(43,33,24,0.25);
+    color:var(--text-on-paper);
+  }
+
+  /* ---------- iOS: agregar a inicio ---------- */
+  .ios-banner{
+    display:none;
+    align-items:center;
+    gap:12px;
+    max-width:760px;
+    margin:0 auto 22px;
+    padding:12px 16px;
+    background:rgba(241,233,214,0.08);
+    border:1px solid rgba(242,169,59,0.35);
+    border-radius:12px;
+    font-size:13px;
+    color:var(--text-on-ink-dim);
+    line-height:1.4;
+  }
+  .ios-banner.show{ display:flex; }
+  .ios-banner .icon{
+    flex-shrink:0;
+    width:30px;height:30px;
+    border-radius:8px;
+    background:var(--ink-3);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .ios-banner strong{ color:var(--text-on-ink); }
+  .ios-banner button{
+    flex-shrink:0;
+    background:transparent;
+    border:none;
+    color:var(--text-on-ink-dim);
+    font-size:20px;
+    line-height:1;
+    cursor:pointer;
+    padding:6px;
+    min-width:32px;
+    min-height:32px;
+  }
+
+  /* ---------- Botón flotante (recentrar) ---------- */
+  .fab{
+    position:fixed;
+    right:calc(18px + env(safe-area-inset-right));
+    bottom:calc(20px + env(safe-area-inset-bottom));
+    width:52px;height:52px;
+    border-radius:50%;
+    background:rgba(35,48,41,0.75);
+    backdrop-filter:saturate(180%) blur(16px);
+    -webkit-backdrop-filter:saturate(180%) blur(16px);
+    border:1px solid rgba(241,233,214,0.18);
+    box-shadow:0 8px 24px rgba(0,0,0,0.4);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    color:var(--marigold);
+    cursor:pointer;
+    z-index:50;
+    transition:transform 0.12s ease;
+  }
+  .fab.show{ display:flex; }
+  .fab:active{ transform:scale(0.9); }
+  .fab.spinning svg{ animation:spin 0.8s linear infinite; }
+
+  footer{
+    text-align:center;
+    padding:28px 20px 40px;
+    font-size:12px;
+    color:var(--text-on-ink-dim);
+    font-family:'Space Mono', monospace;
+  }
+  footer a{ color:var(--marigold); }
+
+  @media (max-width:520px){
+    .hero{ padding:44px 18px 32px; }
+    .ticket-actions{ flex-direction:column; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <span class="eyebrow"><span class="dot"></span>Localizador de antojos</span>
+    <h1>¿Qué se te<br><span>antoja</span> hoy?</h1>
+    <p class="sub">Encuentra los puestos y restaurantes más cercanos a donde estás parado ahorita, con ruta, teléfono y reseñas a un toque.</p>
+    <button class="locate-btn" id="locateBtn" type="button">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v4M12 18v4M2 12h4M18 12h4"></path></svg>
+      Usar mi ubicación
+    </button>
+    <div class="status-line" id="statusLine">Necesitamos tu ubicación para buscar cerca de ti.</div>
+  </div>
+</header>
+
+<div class="ios-banner" id="iosBanner">
+  <span class="icon">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 8l5-5 5 5"></path><path d="M5 21h14a2 2 0 0 0 2-2v-5a2 2 0 0 0-2-2h-3"></path><path d="M8 12H5a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2"></path></svg>
+  </span>
+  <span><strong>Tip:</strong> toca Compartir <span style="opacity:.8">(⬆️)</span> y luego "Agregar a inicio" para abrir esto como app, a pantalla completa.</span>
+  <button id="iosBannerClose" aria-label="Cerrar aviso" type="button">&times;</button>
+</div>
+
+<section class="controls" id="controls" style="display:none;">
+  <div class="controls-row">
+    <div class="radius-control">
+      <label for="radiusSlider">Radio de búsqueda</label>
+      <input type="range" id="radiusSlider" min="300" max="3000" step="100" value="1000">
+      <span class="radius-value mono" id="radiusValue">1.0 km</span>
+    </div>
+    <button class="refresh-btn" id="refreshBtn" type="button">Actualizar búsqueda</button>
+  </div>
+  <div class="chips" id="chips">
+    <button class="chip active" data-filter="all">Todos</button>
+    <button class="chip" data-filter="restaurant">Restaurantes</button>
+    <button class="chip" data-filter="fast_food">Comida rápida / puestos</button>
+    <button class="chip" data-filter="cafe">Cafés</button>
+    <button class="chip" data-filter="bar,pub">Bares</button>
+  </div>
+</section>
+
+<section class="results-wrap">
+  <p class="results-count" id="resultsCount" style="display:none;"></p>
+  <div id="resultsArea">
+    <div class="empty-state">
+      <h3>Aún no hay nada en el radar</h3>
+      <p>Toca "Usar mi ubicación" para que empecemos a buscar puestos y restaurantes cerca de ti.</p>
+    </div>
+  </div>
+</section>
+
+<button class="fab" id="fabBtn" type="button" aria-label="Actualizar mi ubicación">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v4M12 18v4M2 12h4M18 12h4"></path></svg>
+</button>
+
+<footer>
+  Datos de ubicación de puestos vía OpenStreetMap · Rutas y reseñas abren en Google Maps
+</footer>
+
+<script>
+(function(){
+  const locateBtn = document.getElementById('locateBtn');
+  const statusLine = document.getElementById('statusLine');
+  const controls = document.getElementById('controls');
+  const radiusSlider = document.getElementById('radiusSlider');
+  const radiusValue = document.getElementById('radiusValue');
+  const refreshBtn = document.getElementById('refreshBtn');
+  const chips = document.getElementById('chips');
+  const resultsArea = document.getElementById('resultsArea');
+  const resultsCount = document.getElementById('resultsCount');
+
+  let userCoords = null;
+  let allPlaces = [];
+  let activeFilter = 'all';
+
+  const fabBtn = document.getElementById('fabBtn');
+  const iosBanner = document.getElementById('iosBanner');
+  const iosBannerClose = document.getElementById('iosBannerClose');
+
+  // Aviso "agregar a inicio": solo en iPhone/iPad con Safari, cuando no está ya instalada, y si no la cerraron antes
+  (function maybeShowIosBanner(){
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isStandalone = window.navigator.standalone === true;
+    let dismissed = false;
+    try { dismissed = localStorage.getItem('antojosBannerDismissed') === '1'; } catch(e){}
+    if (isIOS && !isStandalone && !dismissed){
+      iosBanner.classList.add('show');
+    }
+  })();
+  iosBannerClose.addEventListener('click', () => {
+    iosBanner.classList.remove('show');
+    try { localStorage.setItem('antojosBannerDismissed', '1'); } catch(e){}
+  });
+
+  fabBtn.addEventListener('click', () => {
+    fabBtn.classList.add('spinning');
+    if (navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          userCoords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+          fetchPlaces().finally(() => fabBtn.classList.remove('spinning'));
+        },
+        () => { fabBtn.classList.remove('spinning'); fetchPlaces(); },
+        { enableHighAccuracy:true, timeout:12000, maximumAge:30000 }
+      );
+    } else {
+      fetchPlaces().finally(() => fabBtn.classList.remove('spinning'));
+    }
+  });
+
+  const TYPE_LABELS = {
+    restaurant: 'Restaurante',
+    fast_food: 'Comida rápida',
+    cafe: 'Café',
+    bar: 'Bar',
+    pub: 'Bar',
+    food_court: 'Plaza de comida'
+  };
+
+  function formatRadius(m){
+    return m >= 1000 ? (m/1000).toFixed(1) + ' km' : m + ' m';
+  }
+  radiusValue.textContent = formatRadius(parseInt(radiusSlider.value, 10));
+  radiusSlider.addEventListener('input', () => {
+    radiusValue.textContent = formatRadius(parseInt(radiusSlider.value, 10));
+  });
+
+  function haversine(lat1, lon1, lat2, lon2){
+    const R = 6371000;
+    const toRad = d => d * Math.PI / 180;
+    const dLat = toRad(lat2-lat1);
+    const dLon = toRad(lon2-lon1);
+    const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  }
+  function formatDist(m){
+    return m >= 1000 ? (m/1000).toFixed(1) + ' km' : Math.round(m) + ' m';
+  }
+
+  function setStatus(msg, kind){
+    statusLine.textContent = msg;
+    statusLine.className = 'status-line' + (kind ? ' ' + kind : '');
+  }
+
+  locateBtn.addEventListener('click', () => {
+    if (!navigator.geolocation){
+      setStatus('Tu navegador no permite compartir ubicación. Prueba desde el celular.', 'error');
+      return;
+    }
+    locateBtn.disabled = true;
+    setStatus('Buscando tu ubicación...');
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        userCoords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+        setStatus('Ubicación lista. Buscando lo más cercano...', 'ok');
+        locateBtn.disabled = false;
+        controls.style.display = 'block';
+        fabBtn.classList.add('show');
+        fetchPlaces();
+      },
+      (err) => {
+        locateBtn.disabled = false;
+        if (err.code === err.PERMISSION_DENIED){
+          setStatus('Bloqueaste el permiso de ubicación. Actívalo en los ajustes del navegador para poder buscar.', 'error');
+        } else {
+          setStatus('No pudimos obtener tu ubicación. Intenta de nuevo.', 'error');
+        }
+      },
+      { enableHighAccuracy:true, timeout:12000, maximumAge:60000 }
+    );
+  });
+
+  refreshBtn.addEventListener('click', fetchPlaces);
+
+  chips.addEventListener('click', (e) => {
+    const btn = e.target.closest('.chip');
+    if (!btn) return;
+    chips.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = btn.dataset.filter;
+    renderResults();
+  });
+
+  function showLoading(){
+    resultsCount.style.display = 'none';
+    resultsArea.innerHTML =
+      '<div class="loading-state">' +
+        '<div class="spinner"></div>' +
+        '<h3>Checando el mapa...</h3>' +
+        '<p>Esto puede tardar unos segundos según qué tan lleno de puestos esté tu rumbo.</p>' +
+      '</div>';
+  }
+
+  function showEmpty(title, text){
+    resultsCount.style.display = 'none';
+    resultsArea.innerHTML =
+      '<div class="empty-state">' +
+        '<h3>' + title + '</h3>' +
+        '<p>' + text + '</p>' +
+      '</div>';
+  }
+
+  async function fetchPlaces(){
+    if (!userCoords) return;
+    showLoading();
+    refreshBtn.disabled = true;
+    const radius = parseInt(radiusSlider.value, 10);
+    const query = '[out:json][timeout:25];(' +
+      'node["amenity"~"^(restaurant|fast_food|cafe|food_court|bar|pub)$"](around:' + radius + ',' + userCoords.lat + ',' + userCoords.lon + ');' +
+      'way["amenity"~"^(restaurant|fast_food|cafe|food_court|bar|pub)$"](around:' + radius + ',' + userCoords.lat + ',' + userCoords.lon + ');' +
+      ');out center tags;';
+
+    const endpoints = [
+      'https://overpass-api.de/api/interpreter',
+      'https://overpass.kumi.systems/api/interpreter'
+    ];
+
+    let data = null;
+    let lastError = null;
+    for (const url of endpoints){
+      try{
+        const res = await fetch(url, {
+          method:'POST',
+          headers:{ 'Content-Type':'text/plain' },
+          body: query
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        data = await res.json();
+        break;
+      } catch(err){
+        lastError = err;
+      }
+    }
+
+    refreshBtn.disabled = false;
+
+    if (!data){
+      setStatus('No se pudo conectar con el mapa. Revisa tu conexión e intenta de nuevo.', 'error');
+      showEmpty('No pudimos cargar el mapa', 'El servicio de mapas no respondió. Toca "Actualizar búsqueda" para intentarlo otra vez.');
+      return;
+    }
+
+    const elements = data.elements || [];
+    allPlaces = elements
+      .map(el => {
+        const lat = el.lat ?? (el.center && el.center.lat);
+        const lon = el.lon ?? (el.center && el.center.lon);
+        if (lat == null || lon == null) return null;
+        const tags = el.tags || {};
+        const distance = haversine(userCoords.lat, userCoords.lon, lat, lon);
+        return {
+          id: el.type + '/' + el.id,
+          name: tags.name || 'Puesto sin nombre registrado',
+          amenity: tags.amenity || 'restaurant',
+          cuisine: tags.cuisine ? tags.cuisine.replace(/_/g, ' ').replace(/;/g, ', ') : null,
+          phone: tags.phone || tags['contact:phone'] || null,
+          openingHours: tags.opening_hours || null,
+          address: buildAddress(tags),
+          lat, lon, distance
+        };
+      })
+      .filter(Boolean)
+      .sort((a,b) => a.distance - b.distance);
+
+    setStatus('Listo. Encontramos ' + allPlaces.length + ' lugar' + (allPlaces.length === 1 ? '' : 'es') + ' en un radio de ' + formatRadius(radius) + '.', 'ok');
+    renderResults();
+  }
+
+  function buildAddress(tags){
+    const parts = [];
+    if (tags['addr:street']){
+      parts.push(tags['addr:street'] + (tags['addr:housenumber'] ? ' ' + tags['addr:housenumber'] : ''));
+    }
+    if (tags['addr:neighbourhood']) parts.push(tags['addr:neighbourhood']);
+    if (tags['addr:suburb'] && !parts.includes(tags['addr:suburb'])) parts.push(tags['addr:suburb']);
+    return parts.length ? parts.join(', ') : null;
+  }
+
+  function matchesFilter(place){
+    if (activeFilter === 'all') return true;
+    return activeFilter.split(',').includes(place.amenity);
+  }
+
+  function renderResults(){
+    const filtered = allPlaces.filter(matchesFilter);
+
+    if (allPlaces.length === 0){
+      showEmpty('No encontramos nada por aquí', 'Prueba aumentar el radio de búsqueda con la barra de arriba y toca "Actualizar búsqueda".');
+      return;
+    }
+    if (filtered.length === 0){
+      showEmpty('Nada de ese tipo por aquí', 'Prueba con otro filtro o amplía el radio de búsqueda.');
+      return;
+    }
+
+    resultsCount.style.display = 'block';
+    resultsCount.textContent = filtered.length + ' lugar' + (filtered.length === 1 ? '' : 'es') + ' ordenados de más cerca a más lejos';
+
+    resultsArea.innerHTML = '<div class="grid">' +
+      filtered.map((p, i) => renderCard(p, i+1)).join('') +
+      '</div>';
+  }
+
+  function renderCard(p, rank){
+    const typeLabel = TYPE_LABELS[p.amenity] || 'Cocina';
+    const dirUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + p.lat + ',' + p.lon;
+    const reviewQuery = encodeURIComponent(p.name + ' ' + p.lat + ',' + p.lon);
+    const reviewUrl = 'https://www.google.com/maps/search/?api=1&query=' + reviewQuery;
+
+    const phoneRow = p.phone
+      ? '<div class="row"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg><a href="tel:' + p.phone.replace(/\s+/g,'') + '">' + p.phone + '</a></div>'
+      : '<div class="row"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg><span>Sin teléfono registrado en el mapa</span></div>';
+
+    const addressRow = '<div class="row"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg><span>' + (p.address || 'Sin dirección exacta registrada') + '</span></div>';
+
+    const hoursRow = '<div class="row"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg><span>' + (p.openingHours || 'Horario no disponible') + '</span></div>';
+
+    return (
+      '<article class="ticket">' +
+        '<div class="ticket-top">' +
+          '<div class="ticket-head">' +
+            '<span class="ticket-rank mono">#' + String(rank).padStart(2,'0') + '</span>' +
+            '<span class="ticket-dist mono">' + formatDist(p.distance) + '</span>' +
+          '</div>' +
+          '<h3 class="ticket-name">' + escapeHtml(p.name) + '</h3>' +
+          '<div class="ticket-badges">' +
+            '<span class="badge type">' + typeLabel + '</span>' +
+            (p.cuisine ? '<span class="badge cuisine">' + escapeHtml(p.cuisine) + '</span>' : '') +
+          '</div>' +
+          '<div class="ticket-meta">' + addressRow + phoneRow + hoursRow + '</div>' +
+        '</div>' +
+        '<div class="tear-line"></div>' +
+        '<div class="ticket-actions">' +
+          '<a class="action-directions" href="' + dirUrl + '" target="_blank" rel="noopener">Cómo llegar</a>' +
+          '<a class="action-reviews" href="' + reviewUrl + '" target="_blank" rel="noopener">Ver reseñas</a>' +
+        '</div>' +
+      '</article>'
+    );
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+})();
+</script>
+
+</body>
+</html>
